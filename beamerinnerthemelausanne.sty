@@ -1,0 +1,76 @@
+\mode<presentation>
+
+% Use circles for bullet points
+\setbeamertemplate{items}[circle]
+
+% Use standard enumerated lists
+\setbeamertemplate{enumerate items}[default]
+
+% Empty background
+\setbeamertemplate{background}{}
+
+% Title page
+\defbeamertemplate*{title page}{lausanne}[1][]
+{ 
+  % no footline on title page
+  \setbeamertemplate{footline}{}
+
+  % for the full size background image
+  \ifempty{\inserttitlegraphic}{}{
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[at=(current page.center)] {
+          \includegraphics[height=\paperheight]{\inserttitlegraphic}%
+        };
+    \end{tikzpicture}
+  }
+
+  \pgfsetfillopacity{0.75}  % for the semi-transparent background
+  \begin{beamercolorbox}[sep=10pt,#1]{title box}
+    \pgfsetfillopacity{1}%
+    \centering%
+    {\usebeamerfont{title}\inserttitle}
+
+    {\usebeamerfont{subtitle}\insertsubtitle}
+
+    \bigskip
+
+    {\usebeamerfont{author}\insertauthor} \\
+    {\usebeamerfont{date}\insertdate}
+
+    \bigskip
+
+    \insertlogo
+    %\inserttitlelogo
+
+    \vspace{0.25cm}
+
+    %\normalsize
+    {\usebeamerfont{institute}\insertinstitute}
+  \end{beamercolorbox}
+
+  % we don't want to count title frame
+  \addtocounter{framenumber}{-1}
+
+}
+
+% Add section titles
+\AtBeginSection[]
+{
+  \begin{frame}[plain]
+    % for the full size background image
+    %\@ifmtarg{\insertsectiongraphic}{The graphic is empty}{The graphic file: ``\insertsectiongraphic''}
+    \ifempty{\insertsectiongraphic}{}{%
+      \begin{tikzpicture}[remember picture,overlay]
+        \node[at=(current page.center)] {
+            \includegraphics[height=\paperheight]{\insertsectiongraphic}%
+          };
+      \end{tikzpicture}
+    }
+
+    \begin{tcolorbox}[color=title box]
+      \centering
+      \huge
+      \insertsection
+    \end{tcolorbox}
+  \end{frame}
+}

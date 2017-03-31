@@ -1,0 +1,135 @@
+\mode<presentation>
+
+% Requirement
+\RequirePackage{tikz}
+\RequirePackage{xkeyval}
+\RequirePackage{xifthen}
+\RequirePackage{pifont}% http://ctan.org/pkg/pifont
+\RequirePackage{wasysym}% for smiley
+
+% Settings
+\useinnertheme{lausanne}
+\useoutertheme{lausanne}
+\usecolortheme{lausanne}
+
+% We like Serif fonts for math
+\usefonttheme[onlymath]{serif}
+\setbeamerfont{title}{size=\huge}
+\setbeamerfont{subtitle}{size=\Large}
+\setbeamerfont{date}{shape=\scshape}
+
+% Frame title on the right
+\setbeamertemplate{frametitle}[default][right]
+
+% not yet uncovered stuff is transparently visible
+\setbeamercovered{transparent}
+
+% for numbered sections in Table of Content
+\setbeamertemplate{section in toc}[sections numbered]
+
+\mode<all>
+
+% sometimes simple colors are good
+\setbeamercolor{black on white}{fg=black,bg=white}
+
+% The check an cross marks
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+% Sometimes we want to use ticks instead of bullet points, or a smiley
+\newcommand{\citem}{\item[\textcolor{structure.fg}{\cmark}]}
+\newcommand{\xitem}{\item[\textcolor{alerted text.fg}{\xmark}]}
+\newcommand{\colorsmiley}{\textcolor{structure.fg}{\smiley}}
+\newcommand{\smileyitem}{\item[\colorsmiley]}
+
+% Detect empty options
+\makeatletter
+\def\ifempty#1#2#3{%
+  \if&#1&
+    #2
+  \else
+    #3
+  \fi
+}
+\makeatother
+
+% renew section command with options for a large background image
+\makeatletter
+\define@key{mysection}{short}[]{\def\mysectionshort{#1}}
+\define@key{mysection}{image}[]{\def\insertsectiongraphic{#1}}
+% Of course, we need to take care of the starred version too
+\newcommand*{\old@section}{}
+\let\old@section\section
+\renewcommand*{\section}{%
+  \@ifstar{\old@section*}{\new@section}%
+}
+\newcommand*{\new@section}[2][]{%
+  \setkeys{mysection}{short,image,#1}%
+  \old@section[\mysectionshort]{#2}%
+}
+\makeatother
+
+% New full frame picture environment
+\newenvironment{fullframe}[1]{
+    \setbeamertemplate{footline}{}
+    \begin{frame}
+      \begin{tikzpicture}[remember picture,overlay]
+        \node[at=(current page.center)] {
+          \includegraphics[height=\paperheight]{#1}
+        };
+      \end{tikzpicture}
+}{
+    \end{frame}
+}
+
+% Title with semi transparent background environment
+\makeatletter
+\define@key{mytbox}{color}[black on white]{\def\tboxcolor{#1}}
+\define@key{mytbox}{border}[10pt]{\def\tboxborder{#1}}
+\define@key{mytbox}{transp}[0.75]{\def\tboxtransp{#1}}
+\makeatother
+
+\newenvironment{tcolorbox}[1][]{
+  \setkeys{mytbox}{color,border,transp,#1}
+  \pgfsetfillopacity{\tboxtransp}
+  \begin{beamercolorbox}[sep=\tboxborder]{\tboxcolor}
+    \pgfsetfillopacity{1}%
+}{
+  \end{beamercolorbox}
+}
+
+% An environment for a take home message slide
+\makeatletter
+\define@key{mytakehome}{imgwidth}[0.5\textwidth]{\def\thwidth{#1}}
+\define@key{mytakehome}{title}[]{\def\thtitle{#1}}
+\makeatother
+
+\newlength{\mysectionheadlength}
+
+\newenvironment{takehome}[1][]{
+
+  \setkeys{mytakehome}{imgwidth,title,#1}
+
+  % Default title based on section
+  \settowidth{\mysectionheadlength}{\insertsectionhead}
+  \ifthenelse{\mysectionheadlength > 0}{
+    \def\defaulttitle{\insertsectionhead: Take Home Message}
+  }{
+    \def\defaulttitle{\insertsection}
+  }
+
+  % custom title if provided
+  \ifempty{\thtitle}{\def\mytitle{\defaulttitle}}{\def\mytitle{\thtitle}}
+
+  \begin{frame}{\mytitle}
+
+    \ifempty{\inserttitlegraphic}{}{
+      \begin{center}
+        \includegraphics[width=\thwidth]{\insertsectiongraphic}
+      \end{center}
+    }
+
+}{
+  \end{frame}
+}
+
